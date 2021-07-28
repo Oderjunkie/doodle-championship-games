@@ -1,8 +1,8 @@
 /*
+ * Copyright The Closure Library Authors.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
- Copyright The Closure Library Authors.
- SPDX-License-Identifier: Apache-2.0
-*/
 var l;
 function spigotify(iterable) {
     var index = 0;
@@ -98,27 +98,36 @@ function findGlobal(globalprop, callback) {
 };
 
 findGlobal("Symbol", function(Symbol) {
-    if (Symbol) return Symbol;
-    function g(a, n) {
-        this.ha = a;
-        define_property(this, "description", {
-            configurable: true,
-            writable: true,
-            value: n
-        })
+    if (Symbol)
+        return Symbol;
+    
+    class Symbolfallback {
+        constructor(uid, description) {
+            this.uid = uid;
+            define_property(this, "description", {
+                configurable: true,
+                writable: true,
+                value: description
+            });
+        }
+        toString() {
+            return this.uid;
+        }
+    }
+    var uid = "jscomp_symbol_" + (1E9 * Math.random() >>> 0) + "_";
+    var symbol_count = 0;
+    function createSymbol(description) {
+        if (this instanceof createSymbol)
+            throw new TypeError("Error x00"); // TODO: Error x00, what does this mean?
+        return new Symbolfallback(uid + (description || "") + "_" + symbol_count++, description);
+        // let random = 1E9 * Math.random() >>> 0;
+        // fallback.name = `jscomp_symbol_${random}_${description}_${symbol_count}`;
+        // fallback.description = description;
     };
-    g.prototype.toString = function() {
-        return this.ha
-    };
-    var m = "jscomp_symbol_" + (1E9 * Math.random() >>> 0) + "_";
-    var k = 0;
-    function c(a) {
-        if (this instanceof c) throw new TypeError("b");
-        return new g(m + (a || "") + "_" + k++, a)
-    };
-    return c
+    return createSymbol;
 });
 
+// TODO: Deobfuscate
 findGlobal("Symbol.iterator", function(b) {
     if (b) return b;
     b = Symbol("Symbol.iterator");
@@ -134,6 +143,8 @@ findGlobal("Symbol.iterator", function(b) {
     }
     return b
 });
+
+// TODO: Deobfuscate
 var fa = function(b) {
         b = {
             next: b
@@ -184,6 +195,8 @@ else {
         return b
     } : null
 }
+
+// TODO: Deobfuscate
 var na = ja,
     q = function(b, g) {
         b.prototype = ia(g.prototype);
